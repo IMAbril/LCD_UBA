@@ -137,7 +137,7 @@ import os
 # (df['nombre_com'] == 'Ombú').sum()
 # 
 # df['nombre_com'].unique()
-# cant_ejemplares = df['nombre_com'].value_counts()
+# cant_ejemplares = df['nombre_com'].value_counts() #Este método devuelve una estructura conteniendo los valores presentes en la serie y el número de ocurrencias de cada uno. Estos valores se muestran en orden decreciente:
 # cant_ejemplares.head(10)
 # df_jacarandas = df[df['nombre_com']=='Jacarandá']
 # cols = ['altura_tot','diametro', 'inclinacio']
@@ -236,3 +236,89 @@ especies_seleccionadas = ['Tilia x moltkei', 'Jacaranda mimosifolia', 'Tipuana t
 Una forma de seleccionarlas es la siguiente:
 df_lineal_seleccion = df_lineal[df_lineal['nombre_cientifico'].isin(especies_seleccionadas)
 """
+# 1. Cargar la información del archivo csv en un dataframe denominado data_arboles_veredas. El dataset debe
+# tener solamente las siguiente columnas:
+# cols_sel = ['nombre_cientifico', 'ancho_acera', 'diametro_altura_pecho', 'altura_arbol']
+
+
+archivo = 'arbolado-publico-lineal-2017-2018.csv'
+directorio = './archivos/'
+data = os.path.join(directorio, archivo)
+df = pd.read_csv(data)
+cols_sel = ['nombre_cientifico', 'ancho_acera', 'diametro_altura_pecho', 'altura_arbol']
+data_arboles_veredas = df[cols_sel]
+
+#2. Imprimir las diez especies más frecuentes con sus respectivas cantidades
+especies_masfrecuentes10 = data_arboles_veredas['nombre_cientifico'].value_counts().head(10)
+print(especies_masfrecuentes10)
+
+#3. Trabajaremos con las siguientes especies seleccionadas:
+# especies_seleccionadas = ['Tilia x moltkei', 'Jacaranda mimosifolia', 'Tipuana tipu']
+# Una forma de seleccionarlas es la siguiente:
+# df_lineal_seleccion = df_lineal[df_lineal['nombre_cientifico'].isin(especies_seleccionadas)
+
+
+"""
+PARTE 3
+Se quiere estudiar si hay diferencias entre los ejemplares de una misma especie según si los datos provienen de un
+dataset u otro (arbolado-en-espacios-verdes.csv vs. arbolado-publico-lineal-2017-2018.csv) . Para eso tendremos que
+relacionar datos de ambos dataframes.
+El GCBA usa en el dataset arbolado-en-espacios-verdes.csv los nombres de columnas 'altura_tot', 'diametro' y
+'nombre_cie' para las alturas, diámetros y nombres científicos de los ejemplares, y en el otro dataset
+(arbolado-publico-lineal-2017-2018.csv) usa 'altura_arbol', 'diametro_altura_pecho' y 'nombre_cientifico' para las
+mismas características.
+También se puede observar que los nombres científicos varían entre ambos datasets. A modo de ejemplo 'Tipuana
+Tipu' se transforma en 'Tipuana tipu' y 'Jacarandá mimosifolia' en 'Jacaranda mimosifolia'. Obviamente son cambios
+menores pero suficientes para desalentar al usuarie desprevenide.
+
+Proponemos los siguientes pasos para comparar los diámetros a la altura del pecho de las tipas en ambos tipos de
+entornos (datasets):
+1. Para cada dataset armar uno nuevo (denominarlos df_tipas_parques y df_tipas_veredas, respectivamente)
+seleccionando sólo las filas correspondientes a las tipas y las columnas correspondientes al diámetro, a la altura del
+pecho y alturas.
+Importante. Hacerlo como copias (usando .copy() como aprendimos previamente) para poder trabajar en estos
+nuevos dataframes sin modificar los dataframes grandes originales.
+2. Renombrar las columnas que muestran la altura y el diámetro a la altura del pecho para que se llamen igual en
+ambos dataframes.
+Ayuda. Explorar el comando rename.
+3. Agregar a cada dataframe (df_tipas_parques y df_tipas_veredas) una columna llamada 'ambiente', que en
+un caso valga siempre 'parque' y en el otro caso siempre 'vereda'.
+4. Juntar ambos datasets con el comando df_tipas = pd.concat([df_tipas_veredas, df_tipas_parques]).
+De esta forma tendremos en un mismo dataframe la información de las tipas distinguidas por ambiente.
+"""
+
+
+#1. Para cada dataset armar uno nuevo (denominarlos df_tipas_parques y df_tipas_veredas, respectivamente)
+# seleccionando sólo las filas correspondientes a las tipas y las columnas correspondientes al diámetro, a la altura del
+# pecho y alturas.
+# Importante. Hacerlo como copias (usando .copy() como aprendimos previamente) para poder trabajar en estos
+# nuevos dataframes sin modificar los dataframes grandes originales.
+
+archivos = ['arbolado-publico-lineal-2017-2018.csv', 'arbolado-en-espacios-verdes.csv']
+directorio = './archivos/'
+data_0 = os.path.join(directorio, archivos[0])
+data_1 = os.path.join(directorio, archivos[1])
+df_veredas = pd.read_csv(data_0)
+df_parques = pd.read_csv(data_1)
+
+df_tipas_veredas = df_veredas[df_veredas['nombre_cientifico'].str.lower() == 'tipuana tipu'].copy()
+df_tipas_veredas = df_tipas_veredas[['altura_arbol','diametro_altura_pecho']].copy()
+
+df_tipas_parques = df_parques[df_parques['nombre_cie'].str.lower() == 'tipuana tipu'].copy()
+df_tipas_parques = df_tipas_parques[['altura_tot', 'diametro']].copy()
+
+
+#2. Renombrar las columnas que muestran la altura y el diámetro a la altura del pecho para que se llamen igual en
+# ambos dataframes.
+# Ayuda: Explorar el comando rename.
+df_tipas_parques.rename(columns = {'altura_tot':'altura_arbol', 'diametro':'diametro_altura_pecho'}, inplace = True) #Cuando inplace=True, la operación se aplica directamente al objeto original y no se devuelve un nuevo objeto. 
+
+#3. Agregar a cada dataframe (df_tipas_parques y df_tipas_veredas) una columna llamada 'ambiente', que en
+# un caso valga siempre 'parque' y en el otro caso siempre 'vereda'.
+
+df_tipas_parques['ambiente'] = 'parque'
+df_tipas_veredas['ambiente'] = 'vereda'
+
+#4. Juntar ambos datasets con el comando df_tipas = pd.concat([df_tipas_veredas, df_tipas_parques]).
+# De esta forma tendremos en un mismo dataframe la información de las tipas distinguidas por ambiente.
+df_tipas = pd.concat([df_tipas_veredas, df_tipas_parques])
