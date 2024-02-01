@@ -28,12 +28,80 @@ def leer_parque(nombre_archivo, parque):
         diccionarios.append(arbol_dic)
     return diccionarios
 
+#2
+def especies(lista_arboles): 
+    lista_especies = []
+    for arbol in lista_arboles:
+        lista_especies.append(arbol['nombre_com'])
+    return set(lista_especies)
+
+#3
+def contar_ejemplares(lista_arboles):
+    especies_parque = especies(lista_arboles)
+    df = pd.DataFrame(lista_arboles)
+    cants_ejemplares = []
+    for especie in especies_parque:
+        cants_ejemplares.append((df['nombre_com']==especie).sum())
+    ejemplares = dict(zip(especies_parque, cants_ejemplares))
+    return ejemplares
+
+#4
+def obtener_alturas(lista_arboles, especie):
+    df = pd.DataFrame(lista_arboles)
+    df = df[df['nombre_com']==especie]
+    alturas = list(df['altura_tot'])
+    return alturas
+
+#5
+def obtener_inclinaciones(lista_arboles, especie):
+    df = pd.DataFrame(lista_arboles)
+    df = df[df['nombre_com']==especie]
+    inclinaciones = list(df['inclinacio'])
+    return inclinaciones
+
+#6
+def especimen_mas_inclinado(lista_arboles):
+    lista_especies = especies(lista_arboles)
+    max_inclinacion = 0
+    especie_max_inclinacion = ''
+    for especie in lista_especies:
+        inclinaciones = np.array(obtener_inclinaciones(lista_arboles, especie))
+        inclinacion_max = inclinaciones.max()
+        if inclinacion_max >= max_inclinacion:
+            max_inclinacion = inclinacion_max
+            especie_max_inclinacion = especie
+    return especie_max_inclinacion, max_inclinacion
+        
+#7
+def especie_promedio_mas_inclinado(lista_arboles):
+    lista_especies = especies(lista_arboles)
+    max_prominclinacion = 0
+    especie_max_prominclinacion = ''
+    for especie in lista_especies:
+        inclinaciones = np.array(obtener_inclinaciones(lista_arboles, especie))
+        inclinacion_prom = (inclinaciones.sum())/len(inclinaciones)
+        if inclinacion_prom >= max_prominclinacion:
+            max_prominclinacion = inclinacion_prom
+            especie_max_prominclinacion = especie
+    return especie_max_prominclinacion, max_prominclinacion
+            
+diccionarios = leer_parque(archivo, 'GENERAL PAZ')
+diccionarios2 = leer_parque(archivo, 'CENTENARIO')
+diccionarios3 = leer_parque(archivo, 'ANDES, LOS')
+
+alturas = np.array(obtener_alturas(diccionarios, 'Jacarandá'))
+altura_max = alturas.max()
+altura_prom = (alturas.sum()) / len(alturas)
+
+
+#%%
 diccionarios = leer_parque(archivo, 'GENERAL PAZ')
 print(diccionarios[0])
-
-#2
-
-
+df = pd.DataFrame(diccionarios)
+df = df[df['nombre_com']=='Jacarandá']
+#%%
+        
+        
 
     
     
