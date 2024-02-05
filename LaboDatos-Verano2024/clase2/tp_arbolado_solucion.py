@@ -72,7 +72,7 @@ def especimen_mas_inclinado(lista_arboles):
             especie_max_inclinacion = especie
     return especie_max_inclinacion, max_inclinacion
         
-#7
+#7 REVISAR EJERCICIO 7, NO PASA LOS CASOS DE TEST
 def especie_promedio_mas_inclinado(lista_arboles):
     lista_especies = especies(lista_arboles)
     max_prominclinacion = 0
