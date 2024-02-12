@@ -7,7 +7,7 @@ Fecha  : 2023-03-07
 """
 
 # Importamos bibliotecas
-import pandas as pd 
+import pandas as pd
 from inline_sql import sql, sql_val
 #%%
 def main():
